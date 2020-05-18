@@ -1,0 +1,34 @@
+#!/usr/bin/expect
+# A Expect script to connect target server
+# Wriiten by: Jaekwon.ha
+# Last updated on: Nov/25/2019
+
+set timeout 10
+set GATEWAY [lindex $argv 0]
+set GATEWAY_PW [lindex $argv 1]
+set TARGET [lindex $argv 2]
+set GOOGLE_OTP [lindex $argv 3]
+
+spawn ssh "$GATEWAY"
+
+expect {
+	"Verification code:" {
+		send "$GOOGLE_OTP\r"
+		exp_continue
+	}
+	"Password:" {
+		send "$GATEWAY_PW\r"
+		exp_continue
+	}
+	"@ogx01.infra" {
+		send "kinit\r"
+		exp_continue
+	}
+	"@DEV-SYSTEM.SKT" {
+		send "$GATEWAY_PW\r"
+	}
+}
+
+send "ssh $TARGET\r"
+
+interact
